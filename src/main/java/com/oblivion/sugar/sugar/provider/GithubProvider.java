@@ -11,27 +11,42 @@ import java.io.IOException;
 @Component
 public class GithubProvider {
     public String getAccessToken(AccessTokenDto accessTokenDto){
+        // -------------------------------------------
         System.out.println("enter getAccessToken");
-
+        // -------------------------------------------
         MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
         OkHttpClient client = new OkHttpClient();
         RequestBody body = RequestBody.create(mediaType, JSON.toJSONString(accessTokenDto));
+        // -------------------------------------------
+        System.out.println("set getAccessToken");
+        // -------------------------------------------
         Request request = new Request.Builder()
                 .url("https://github.com/login/oauth/access_token")
                 .post(body)
                 .build();
-        try (Response response = client.newCall(request).execute()) {
-            String str = response.body() != null ? response.body().string() : null;
-            System.out.println("getAccessToken ok");
-            return str;
+        // -------------------------------------------
+        System.out.println("post getAccessToken");
+        // -------------------------------------------
+        try {
+            Response response = client.newCall(request).execute();
+            // -------------------------------------------
+            System.out.println("enter try");
+            // -------------------------------------------
+            String responseStr = response.body() != null ? response.body().string() : null;
+            String accessToken = responseStr.split("&")[0].split("=")[1];
+            return accessToken;
         } catch (IOException e){
+            // -------------------------------------------
             System.out.println(e.toString());
+            // -------------------------------------------
         }
         return null;
     }
 
     public GithubUser getUser(String accessToken) {
+        // -------------------------------------------
         System.out.println("enter getUser");
+        // -------------------------------------------
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url("https://api.github.com/user?access_token=" + accessToken)
@@ -45,4 +60,3 @@ public class GithubProvider {
         return null;
     }
 }
-//https://github.com/login/oauth/authorize?client_id=e31daf76b4835054d13a&redirect_uri=http://localhost:8887/callback&scope=user&state=1
