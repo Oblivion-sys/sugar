@@ -7,34 +7,28 @@ import okhttp3.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 public class GithubProvider {
     public String getAccessToken(AccessTokenDto accessTokenDto){
         // -------------------------------------------
         System.out.println("enter getAccessToken");
+        System.out.println(JSON.toJSONString(accessTokenDto));
         // -------------------------------------------
         MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
         OkHttpClient client = new OkHttpClient();
-        RequestBody body = RequestBody.create(mediaType, JSON.toJSONString(accessTokenDto));
-        // -------------------------------------------
-        System.out.println("set getAccessToken");
-        // -------------------------------------------
+        RequestBody body = RequestBody.create(JSON.toJSONString(accessTokenDto),mediaType);
         Request request = new Request.Builder()
                 .url("https://github.com/login/oauth/access_token")
                 .post(body)
                 .build();
-        // -------------------------------------------
-        System.out.println("post getAccessToken");
-        // -------------------------------------------
         try {
             Response response = client.newCall(request).execute();
-            // -------------------------------------------
-            System.out.println("enter try");
-            // -------------------------------------------
-            String responseStr = response.body() != null ? response.body().string() : null;
-            String accessToken = responseStr.split("&")[0].split("=")[1];
-            return accessToken;
+            String responseStr = response.body() != null ? Objects.requireNonNull(response.body()).string() : null;
+            assert responseStr != null;
+            System.out.println(responseStr);
+            return responseStr.split("&")[0].split("=")[1];
         } catch (IOException e){
             // -------------------------------------------
             System.out.println(e.toString());
@@ -45,18 +39,20 @@ public class GithubProvider {
 
     public GithubUser getUser(String accessToken) {
         // -------------------------------------------
-        System.out.println("enter getUser");
+        System.out.println("enter getUser:" + accessToken);
         // -------------------------------------------
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url("https://api.github.com/user?access_token=" + accessToken)
+                .url("https://api.github.com/user")
+                .header("Authorization","token "+accessToken)
                 .build();
         try {
             Response response = client.newCall(request).execute();
-            String str = response.body()!= null ? response.body().string() : null;
-            GithubUser githubUser = JSON.parseObject(str, GithubUser.class);
-            return githubUser;
-        } catch (IOException e) {}
+            String str = response.body()!= null ? Objects.requireNonNull(response.body()).string() : null;
+            return JSON.parseObject(str,GithubUser.class);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
         return null;
     }
 }

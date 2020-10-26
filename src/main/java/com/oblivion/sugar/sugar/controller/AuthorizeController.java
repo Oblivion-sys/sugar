@@ -30,21 +30,23 @@ public class AuthorizeController {
                            @RequestParam(name = "state") String state) {
         // -------------------------------------------
         System.out.println("enter callback");
-        System.out.println("【code】" + code);
-        System.out.println("【state】" + state);
         // -------------------------------------------
         AccessTokenDto accessTokenDto = new AccessTokenDto();
-        accessTokenDto.setClient_id(clientId);
-        accessTokenDto.setClient_secret(clientSecret);
+        accessTokenDto.setClient_id("e31daf76b4835054d13a");
+        accessTokenDto.setClient_secret("073f23f5cca2720471f6f6b96c348da77f00dfe7");
         accessTokenDto.setCode(code);
-        accessTokenDto.setRedirect_uri(redirectUri);
+        accessTokenDto.setRedirect_uri("http://localhost:8887/callback");
         accessTokenDto.setState(state);
         String accessToken = githubProvider.getAccessToken(accessTokenDto);
         if(accessToken != null) {
             GithubUser githubUser = githubProvider.getUser(accessToken);
-            // -------------------------------------------
-            System.out.println(githubUser);
-            // -------------------------------------------
+            if(githubUser != null) {
+                // -------------------------------------------
+                System.out.println(githubUser.getName());
+                // -------------------------------------------
+            }else{
+                System.out.println("no user");
+            }
         }
         return "index";
     }
