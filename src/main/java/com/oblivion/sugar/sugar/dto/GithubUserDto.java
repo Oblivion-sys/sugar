@@ -26,4 +26,13 @@ public class GithubUserDto {
     public void setAvatarUrl(String avatar_url) {
         this.avatar_url = avatar_url;
     }
+
+    @Override
+    public String toString() {
+        return "GithubUserDto{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                ", avatar_url='" + avatar_url + '\'' +
+                '}';
+    }
 }
