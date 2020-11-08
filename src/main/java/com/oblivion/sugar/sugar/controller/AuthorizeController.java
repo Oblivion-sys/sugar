@@ -1,8 +1,7 @@
 package com.oblivion.sugar.sugar.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.oblivion.sugar.sugar.dto.AccessTokenDto;
-import com.oblivion.sugar.sugar.dto.GithubUser;
+import com.oblivion.sugar.sugar.dto.GithubUserDto;
 import com.oblivion.sugar.sugar.provider.GithubProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,33 +15,33 @@ public class AuthorizeController {
     @Autowired
     private GithubProvider githubProvider;
 
-    @Value("github.client.id")
+    @Value("${github.client.id}")
     private  String clientId;
 
-    @Value("github.client.secret")
+    @Value("${github.client.secret}")
     private  String clientSecret;
 
-    @Value("github.redirect.uri")
+    @Value("${github.redirect.uri}")
     private  String redirectUri;
 
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state) {
-        // -------------------------------------------
-        System.out.println("enter callback");
-        // -------------------------------------------
+        // 获取code参数设置
         AccessTokenDto accessTokenDto = new AccessTokenDto();
-        accessTokenDto.setClient_id("e31daf76b4835054d13a");
-        accessTokenDto.setClient_secret("073f23f5cca2720471f6f6b96c348da77f00dfe7");
+        accessTokenDto.setClient_id(clientId);
+        accessTokenDto.setClient_secret(clientSecret);
         accessTokenDto.setCode(code);
-        accessTokenDto.setRedirect_uri("http://localhost:8887/callback");
+        accessTokenDto.setRedirect_uri(redirectUri);
         accessTokenDto.setState(state);
+        // 获取access_token
         String accessToken = githubProvider.getAccessToken(accessTokenDto);
+        // 获取用户信息
         if(accessToken != null) {
-            GithubUser githubUser = githubProvider.getUser(accessToken);
+            GithubUserDto githubUser = githubProvider.getUser(accessToken);
             if(githubUser != null) {
                 // -------------------------------------------
-                System.out.println(githubUser.getName());
+                System.out.println(githubUser.getId());
                 // -------------------------------------------
             }else{
                 System.out.println("no user");
