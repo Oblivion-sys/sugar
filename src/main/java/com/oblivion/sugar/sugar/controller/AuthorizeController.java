@@ -60,7 +60,7 @@ public class AuthorizeController {
                 // 写入数据库
                 userMapper.insert(user);
                 // 写入cookie 和 session
-                //request.getSession().setAttribute("user",githubUser);
+                request.getSession().setAttribute("user",githubUser);
                 response.addCookie(new Cookie("token",accessToken));
                 return "redirect:/";
             }
